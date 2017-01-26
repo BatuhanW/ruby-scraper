@@ -1,0 +1,40 @@
+# Adequate Rails database.yml
+# PostgreSQL. Versions 9.1 and up are supported.
+
+# You need to setup 3 environment variables.
+# PG_USER: Your postgresql service user. usually 'postgres'.
+# PG_PW: Your postgresql service password.
+# PG_HOST: This is necessary for Gitlab CI to work.
+# Set this to 'postgres' on Gitlab project variables.
+# To set local environment variables, follow;
+# $ vi ~/.bashrc
+# Add this two lines to ~/.bashrc file
+# EXPORT PG_USER='postgres'
+# EXPORT PG_PW='12345678'
+# Update bash
+# $ source ~/.bashrc
+# Test variables.
+# $ echo $PG_USER $PG_PW
+# $ postgres 12345678
+
+default: &default
+  adapter: postgresql
+  encoding: unicode
+  username: <%= ENV['PG_USER'] %>
+  password: <%= ENV['PG_PW'] %>
+  pool: <%= ENV.fetch("RAILS_MAX_THREADS") { 5 } %>
+
+development:
+  <<: *default
+  database: ruby-scraper_development
+
+test:
+  <<: *default
+  database: ruby-scraper_test
+  host: <%= ENV['PG_HOST'] %>
+
+production:
+  <<: *default
+  database: ruby-scraper_production
+  username: api
+  password: <%= ENV['API_DATABASE_PASSWORD'] %>

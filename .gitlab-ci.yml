@@ -1,0 +1,22 @@
+image: ruby:2.2
+services:
+  - postgres:latest
+
+variables:
+  POSTGRES_DB: adequate-api_test
+  # Add POSTGRES_USER project variable to your Gitlab repo.
+  POSTGRES_USER: runner
+  POSTGRES_PASSWORD: ""
+
+stages:
+  - test
+
+test:
+  before_script:
+    - bundle install --without postgres production documentation
+    - gem install rubocop
+  script:
+    - bundle exec rails db:drop db:create db:schema:load db:migrate RAILS_ENV=test
+    - bundle exec rails test
+    - bundle exec rubocop
+    - bundle exec brakeman
